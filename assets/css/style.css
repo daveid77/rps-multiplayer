@@ -50,7 +50,7 @@ h4 {
 }
 p {
   padding: 10px 0;
-  line-height: 1.9;
+  line-height: 1.5;
 }
 ol {
   list-style-type: decimal;
@@ -183,17 +183,21 @@ input[type='submit'] {
 ::placeholder {
   color: #bbb;
 }
-#player-info {
+#player-info, 
+#player-info p {
   display: none; 
+}
+#player-info p:first-of-type {
+  padding: 0 0 10px 0;
 }
 #game-wrapper {
   width: 100%;
   overflow: auto;
 }
 #game-wrapper div {
-  width: 28%;
+  width: 30%;
   height: 150px;
-  margin: 1% 2%;
+  margin: 1%;
   float: left;
   border: 1px solid #ccc;
 }

@@ -24,40 +24,32 @@
     <section id="main">
       <div class="mainwrapper">
 
-        <!-- <div class="sidebar maininner">
-
-          <h3>sidebar</h3>
-
-          <p>sidebar paragraph</p>
-
-        </div> -->
-
         <div class="content maininner">
 
           <div id="header-wrapper">
 
             <div id="start-game">
-              <input type="text" placeholder="Enter Your Name">
+              <input type="text" id="enter-name" placeholder="Enter Your Name">
               <input type="submit" id="start-button" value="Start">
             </div>
 
             <div id="player-info">
-              <p>Hi, <span id="player-name">Pavan</span>! You are player <span id="player-number">1</span></p>
+              <p id="player-id">Hi, <span id="player-name">Pavan</span>! You are player <span id="player-number">1</span></p>
               <p id="your-turn">It's your turn!</p>
-              <p id="waiting-for-turn">Waiting for <span id="player-name">Pavan</span> to choose.</p>
+              <p id="waiting-for-turn">Waiting for <span id="player-name-other">Pavan</span> to choose.</p>
             </div>
 
           </div>
 
           <div id="game-wrapper">
             <div id="player-one-game">
-
+              <p>Waiting for Player 1</p>
             </div>
             <div id="game-result">
 
             </div>
             <div id="player-two-game">
-
+              <p>Waiting for Player 2</p>
             </div>
           </div>
 
