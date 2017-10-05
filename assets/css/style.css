@@ -24,11 +24,11 @@ h1, h2, h3, h4 {
   letter-spacing: .08em;
 }
 h1 {
-  font-size: 42px;
+  font-size: 30px;
   line-height: 1;
   color: #fff;
-  margin: 10px;
-  padding: 15px;
+  margin: 5px;
+  padding: 5px;
   float: left;
 }
 h2 {
@@ -70,7 +70,7 @@ ul ul {
 }
 input, 
 textarea {
-  width: 100%;
+  /*width: 100%;*/
   height: auto;
   padding: 13px 10px;
   font-size: 16px;
@@ -120,12 +120,12 @@ header img {
   overflow: auto;
 }
 .mainwrapper {
-  width: 960px;
+  width: 80%;
   margin: 0 auto;
 }
 .content {
   /*width: 56%;*/
-  width: 594px;
+  width: 90%;
   min-height: 300px;
   float: left;
 }
@@ -137,7 +137,8 @@ header img {
 .maininner {
   position: relative;
   margin: 20px 0;
-  padding: 28px;
+  /*padding: 28px;*/
+  padding: 3% 5%;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 25px;
@@ -165,6 +166,48 @@ footer .copyright a {
   text-decoration: none;
 }
 
+#header-wrapper {
+  width: 50%;
+  min-height: 80px;
+  margin: 0 auto;
+  text-align: center;
+}
+input[type='text'] {
+  width: 76%;
+  box-shadow: inset 1px 1px 1px 1px #eee;
+  float: left;
+}
+input[type='submit'] {
+  float: right;
+}
+::placeholder {
+  color: #bbb;
+}
+#player-info {
+  display: none; 
+}
+#game-wrapper {
+  width: 100%;
+  overflow: auto;
+}
+#game-wrapper div {
+  width: 28%;
+  height: 150px;
+  margin: 1% 2%;
+  float: left;
+  border: 1px solid #ccc;
+}
+#chat-wrapper {
+  width: 80%;
+  margin: 20px auto;
+}
+#chat-area {
+  height: 80px;
+  margin: 0 0 10px 0;
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
 
 /* Width at 980px and below */
 @media screen and (max-width: 980px) {
@@ -172,17 +215,20 @@ footer .copyright a {
 
   }
   .mainwrapper {
-    width: 728px;
+    /*width: 728px;*/
   }
   .content {
-    width: 364px;
+    /*width: 364px;*/
   }
   .sidebar {
-    width: 214px;
+    /*width: 214px;*/
   }
   .maininner {
     margin: 20px 0;
-    padding: 28px;
+    /*padding: 28px;*/
+  }
+  #header-wrapper {
+    width: 60%;
   }
 }
 
@@ -192,22 +238,25 @@ footer .copyright a {
 
   }
   .mainwrapper {
-    width: 100%;
+    /*width: 100%;*/
   }
   .content.maininner {
-    width: 80%;
+    /*width: 80%;
     margin: 20px auto;
     overflow: auto;
-    float: none;
+    float: none;*/
   }
   .sidebar.maininner {
-    width: 80%;
+    /*width: 80%;
     margin: 20px auto;
-    float: none;
+    float: none;*/
   }
   .maininner {
-    margin: 38px 0;
-    padding: 28px;
+    /*margin: 38px 0;
+    padding: 28px;*/
+  }
+  #header-wrapper {
+    width: 70%;
   }
 }
 
@@ -226,19 +275,24 @@ footer .copyright a {
 
   }
   .maininner {
-    margin: 38px 0;
-    padding: 28px;
+    /*margin: 38px 0;
+    padding: 28px;*/
+  }
+  #header-wrapper {
+    width: 86%;
+  }
+  #chat-wrapper {
+    width: 100%;
+    margin: 20px auto;
   }
 }
 
 /* Width at 640px and below */
 @media screen and (max-width: 540px) {
-  header img {
-    height: 50px;
-    padding: 24px 16px 0 0;
-    float: right;
+  #header-wrapper {
+    width: 95%;
   }
-  header img:nth-of-type(2) {
-    display: none;
+  input[type='text'] {
+    width: 70%;
   }
 }
