@@ -15,6 +15,10 @@ $(document).ready(function() {
   };
   firebase.initializeApp(config);
 
+  var database =  firebase.database();
+  var playersRef = database.ref('/players');
+  var chatRef = database.ref('/chat');
+
   var playerId = 0;
   var playerSet = false;
   var name = '';
@@ -22,26 +26,25 @@ $(document).ready(function() {
   var losses = 0;
   var ties = 0;
 
-  var database =  firebase.database();
+  // Chat listeners
+  chatRef.on('child_removed', function(chatSnapshot) {
+    $('#chat-area').empty();
+    $('#chat-area').html('The other player has disconnected.');
+    setTimeout(function() {
+      $('#chat-area').empty();
+    }, 3000);
+  });
+  chatRef.on('child_added', function(chatSnapshot) {
 
-  var playersRef = database.ref('/players');
-
-  var chatRef = database.ref('/chat');
-
-  chatRef.orderByChild('dateAdded').limitToLast(1).on('child_added', function(chatSnapshot) {
-  // chatRef.on('value', function(chatSnapshot) {
-
-      console.log('playerSet: ' + playerSet)
     if (playerSet) {
       if (chatSnapshot.val()) {
+
         var chatPlayer = chatSnapshot.val().playerId; 
-          console.log('chatPlayer: ' + chatPlayer);
         var chatName = chatSnapshot.val().name; 
-          console.log('chatName: ' + chatName);
         var chatMessage = chatSnapshot.val().message;
-          console.log('chatMessage: ' + chatMessage);
-        var newChat = $('<p>').addClass('playerid-' + chatPlayer)
-          .html('<span class="chat-name">' + chatName + '</span>: ' + chatMessage);
+        var newChat = $('<p>')
+          .addClass('playerid-' + chatPlayer)
+          .html('<span class="chat-name">' + chatName + ':</span> ' + chatMessage);
         $('#chat-area').append(newChat);
         $('#chat-area').scrollTop($('#chat-area')[0].scrollHeight);
       }
@@ -51,44 +54,30 @@ $(document).ready(function() {
     console.log("The read failed: " + errorObject.code);
   });
 
+  // Player listener
   playersRef.on('value', function(playersSnapshot) {
 
     var playersNum = playersSnapshot.numChildren();
-      // console.log('playersNum: ' + playersNum);
-      // console.log('playerSet: ' + playerSet);
 
     if (!playerSet) {
       if (playersSnapshot.numChildren() === 2) {
-          // console.log('both 1 & 2 exist, leave playerId as 0');
         $('#busy-game').show();
         $('#start-game').hide();
       } else if (playersSnapshot.child('1').exists()) {
-          // console.log('1 exists, set playerId to 2');
         $('#start-game').show();
         $('#busy-game').hide();
         playerId = 2;
       } else {
-          // console.log('2 exists, set playerId to 1');
         $('#start-game').show();
         $('#busy-game').hide();
         playerId = 1;
       } 
-      // console.log('once playerId: ' + playerId);
     }
 
   }, function(errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
 
-
-  function writeUserData(playerId, name, wins, losses, ties) {
-    firebase.database().ref('players/' + playerId).set({
-      name: name,
-      wins: wins,
-      losses: losses,
-      ties: ties
-    });
-  }
 
   function writeChatData(playerId, name, message) {
     firebase.database().ref('chat').push({
@@ -99,16 +88,43 @@ $(document).ready(function() {
     });
   }
 
+  function writeUserData(playerId, name, wins, losses, ties) {
+    firebase.database().ref('players/' + playerId).set({
+      name: name,
+      wins: wins,
+      losses: losses,
+      ties: ties
+    });
+  }
+
+
+  // Chat send button
+  $('#send-button').on('click', function() {
+
+    if (playerSet) {
+
+      // Do nothing if no message entered
+      if ($('#chat-entry').val() !== '') {
+
+        message = $('#chat-entry').val().trim();
+
+        // Clear previous message
+        $('#chat-entry').val('');
+
+        writeChatData(playerId, name, message);
+
+        chatRef.onDisconnect().remove();
+
+      }
+    }
+  });
 
   // Start button
   $('#start-button').on('click', function() {
-      // console.log('start button click playerId: ' + playerId);
 
     playerSet = true;
-      // console.log('playerSet: ' + playerSet);
 
     name = $('#enter-name').val().trim();
-      // console.log('name: ' + name);
 
     // Hide start game element & show live game elements
     $('#start-game').hide();
@@ -122,21 +138,7 @@ $(document).ready(function() {
     writeUserData(playerId, name, wins, losses, ties);
 
     playerRef = playersRef.child(playerId);
-      // console.log('playerRef: ' + playerRef)
     playerRef.onDisconnect().remove();
-  })
-
-  // Chat send button
-  $('#send-button').on('click', function() {
-      // console.log('send message');
-
-    message = $('#chat-entry').val().trim();
-      //console.log('message: ' + message);
-
-    // Clear previous message
-    $('#chat-entry').val('');
-
-    writeChatData(playerId, name, message);
-  })
+  });
 
 });
