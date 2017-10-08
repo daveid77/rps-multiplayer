@@ -33,8 +33,12 @@
               <input type="submit" id="start-button" value="Start">
             </div>
 
+            <div id="busy-game">
+              <p>Sorry, two players are already playing.</p>
+            </div>
+
             <div id="player-info">
-              <p id="player-id">Hi, <span id="player-name">Pavan</span>! You are player <span id="player-number">1</span></p>
+              <p id="player-id">Hi, <span id="player-name"></span>! You are player <span id="player-number"></span></p>
               <p id="your-turn">It's your turn!</p>
               <p id="waiting-for-turn">Waiting for <span id="player-name-other">Pavan</span> to choose.</p>
             </div>
@@ -54,7 +58,9 @@
           </div>
 
           <div id="chat-wrapper">
-            <div id="chat-area"><!-- Chat Box<br>Chat Box<br>Chat Box --></div>
+            <div id="chat-area-outer">
+              <div id="chat-area"><!-- Chat Box<br>Chat Box<br>Chat Box --></div>
+            </div>
             <input type="text" id="chat-entry" placeholder="Enter Message">
             <input type="submit" id="send-button" value="Send">
           </div>

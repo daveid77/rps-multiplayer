@@ -15,85 +15,74 @@ $(document).ready(function() {
   };
   firebase.initializeApp(config);
 
-  var database =  firebase.database();
-
-  var playernum = '';
+  var playerId = 0;
+  var playerSet = false;
   var name = '';
   var wins = 0;
   var losses = 0;
   var ties = 0;
 
-  var connectionsRef = database.ref('/connections');
+  var database =  firebase.database();
 
-  var connectedRef = database.ref('.info/connected');
+  var playersRef = database.ref('/players');
 
-  connectedRef.on("value", function(snap) {
-    // If they are connected..
-    if (snap.val()) {
-      // Add user to the connections list.
-      var con = connectionsRef.push('userconnect');
-      // Remove user from the connection list when they disconnect.
-      con.onDisconnect().remove();
+  var chatRef = database.ref('/chat');
+
+  chatRef.orderByChild('dateAdded').limitToLast(1).on('child_added', function(chatSnapshot) {
+  // chatRef.on('value', function(chatSnapshot) {
+
+      console.log('playerSet: ' + playerSet)
+    if (playerSet) {
+      if (chatSnapshot.val()) {
+        var chatPlayer = chatSnapshot.val().playerId; 
+          console.log('chatPlayer: ' + chatPlayer);
+        var chatName = chatSnapshot.val().name; 
+          console.log('chatName: ' + chatName);
+        var chatMessage = chatSnapshot.val().message;
+          console.log('chatMessage: ' + chatMessage);
+        var newChat = $('<p>').addClass('playerid-' + chatPlayer)
+          .html('<span class="chat-name">' + chatName + '</span>: ' + chatMessage);
+        $('#chat-area').append(newChat);
+        $('#chat-area').scrollTop($('#chat-area')[0].scrollHeight);
+      }
     }
+
+  }, function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
   });
 
-  // PSEUDOCODE
-  // 
-  // Player enters name, clicks Start 
-  //    - capture name
-  //    - store in firebase
-  //    - change respective "waiting for player" to player name
-  //    - show win, loss, and tie totals in user boxes (all = zero before first match)
-  // Repeat for player 2 start
-  // When two users have started: 
-  //    - populate player one box with RPS choices
-  //    - player one message: "it's your turn" 
-  //    - player two message: "waiting for <player one name> to choose"
-  //    - choosing player box highlighted on both player's screens (yellow outline)
-  // Player one chooses
-  //    - player one choice displayed large (other choices disappear) 
-  //    - populate player two box with RPS choices
-  //    - player one message: "waiting for <player two name> to choose"
-  //    - player two message: "it's your turn" 
-  //    - choosing player box highlighted on both player's screens (yellow outline)
-  // Player two chooses
-  //    - player two choice displayed large (other choices disappear)
-  //    - player messages disappear 
-  //    - calculate winner, or tie
-  //    - populate game result with "<winning player name> Wins!" or "Tie Game!"
-  //    - wins, losses, and ties update accordingly for BOTH players 
-  // Game resets (after delay)
-  // 
-  // CHAT
-  //    - user enters text in input
-  //    - capture text
-  //    - store in firebase as new top level child (same as "players")
-  //    - display in text-area 
-  //    - use different colors for each player in text area
-  //    
-  // DISCONNECT
-  //    - player can leave / refresh page / etc
-  //      - chat text-area message: "<player name> has disconnected."
-  //    - disconnected player's date removed from firebase
-  //    - disconnected player's screen returns to initial state with name/start
-  //    - both player's screens reset to pre-game state (message "waiting for player 2")
-  // 
-  // 
+  playersRef.on('value', function(playersSnapshot) {
 
-database.ref("/players").on("value", function(snapshot) {
-  if (snapshot.child('1').exists()) {
-    console.log('one exists');
-  } else if (snapshot.child('2').exists()) {
-    console.log('two exists');
-  } else {
-    console.log('neither one NOR two exists');
-  }
-}, function(errorObject) {
-  console.log("The read failed: " + errorObject.code);
-});
+    var playersNum = playersSnapshot.numChildren();
+      // console.log('playersNum: ' + playersNum);
+      // console.log('playerSet: ' + playerSet);
 
-  function writeUserData(playernum, name, wins, losses, ties) {
-    firebase.database().ref('players/' + playernum).set({
+    if (!playerSet) {
+      if (playersSnapshot.numChildren() === 2) {
+          // console.log('both 1 & 2 exist, leave playerId as 0');
+        $('#busy-game').show();
+        $('#start-game').hide();
+      } else if (playersSnapshot.child('1').exists()) {
+          // console.log('1 exists, set playerId to 2');
+        $('#start-game').show();
+        $('#busy-game').hide();
+        playerId = 2;
+      } else {
+          // console.log('2 exists, set playerId to 1');
+        $('#start-game').show();
+        $('#busy-game').hide();
+        playerId = 1;
+      } 
+      // console.log('once playerId: ' + playerId);
+    }
+
+  }, function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+
+
+  function writeUserData(playerId, name, wins, losses, ties) {
+    firebase.database().ref('players/' + playerId).set({
       name: name,
       wins: wins,
       losses: losses,
@@ -101,29 +90,53 @@ database.ref("/players").on("value", function(snapshot) {
     });
   }
 
-  // start button
+  function writeChatData(playerId, name, message) {
+    firebase.database().ref('chat').push({
+      playerId: playerId,
+      name: name,
+      message: message,
+      dateAdded: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+
+  // Start button
   $('#start-button').on('click', function() {
-    if (playernum === 1) {
-      playernum = 2;
-    } else {
-      playernum = 1;
-    }
-    name = $('#enter-name').val();
-      console.log('name: ' + name);
-    // hide start game elements & show live game elements
+      // console.log('start button click playerId: ' + playerId);
+
+    playerSet = true;
+      // console.log('playerSet: ' + playerSet);
+
+    name = $('#enter-name').val().trim();
+      // console.log('name: ' + name);
+
+    // Hide start game element & show live game elements
     $('#start-game').hide();
     $('#player-name').text(name);
+    $('#player-number').text(playerId);
     $('#player-info, #player-id').show();
-    // clear previous name entered
+
+    // Clear previous name
     $('#enter-name').val('');
-    writeUserData(playernum, name, wins, losses, ties);
+
+    writeUserData(playerId, name, wins, losses, ties);
+
+    playerRef = playersRef.child(playerId);
+      // console.log('playerRef: ' + playerRef)
+    playerRef.onDisconnect().remove();
   })
 
-  // chat button
+  // Chat send button
   $('#send-button').on('click', function() {
+      // console.log('send message');
 
-    // clear previous text message entered
+    message = $('#chat-entry').val().trim();
+      //console.log('message: ' + message);
+
+    // Clear previous message
     $('#chat-entry').val('');
+
+    writeChatData(playerId, name, message);
   })
 
 });
