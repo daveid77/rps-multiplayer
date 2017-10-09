@@ -17,6 +17,7 @@ $(document).ready(function() {
 
   var database =  firebase.database();
   var playersRef = database.ref('/players');
+  var playersRef1 = database.ref('/players/1');
   var chatRef = database.ref('/chat');
 
   var playerId = 0;
@@ -51,31 +52,38 @@ $(document).ready(function() {
     }
 
   }, function(errorObject) {
-    console.log("The read failed: " + errorObject.code);
+    console.log("The chat read failed: " + errorObject.code);
   });
 
   // Player listener
   playersRef.on('value', function(playersSnapshot) {
 
     var playersNum = playersSnapshot.numChildren();
+      // console.log('playersNum: ' + playersNum); 
+    var playerOneName = playersRef.child('1').name;
+      console.log('playerOneName: ' + playerOneName);
 
+      // console.log('playerSet: ' + playerSet); 
     if (!playerSet) {
       if (playersSnapshot.numChildren() === 2) {
         $('#busy-game').show();
         $('#start-game').hide();
+          console.log('numChildren === 2');
       } else if (playersSnapshot.child('1').exists()) {
         $('#start-game').show();
         $('#busy-game').hide();
+          console.log('child 1 exists');
         playerId = 2;
       } else {
         $('#start-game').show();
         $('#busy-game').hide();
+          console.log('ELSE - no child exists');
         playerId = 1;
       } 
     }
 
   }, function(errorObject) {
-    console.log("The read failed: " + errorObject.code);
+    console.log("The player read failed: " + errorObject.code);
   });
 
 
