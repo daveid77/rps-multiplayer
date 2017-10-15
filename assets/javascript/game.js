@@ -17,12 +17,13 @@ $(document).ready(function() {
 
   var database =  firebase.database();
   var playersRef = database.ref('/players');
-  var playersRef1 = database.ref('/players/1');
   var chatRef = database.ref('/chat');
 
   var playerId = 0;
   var playerSet = false;
   var name = '';
+  var playerOneName = '';
+  var playerTwoName = '';
   var wins = 0;
   var losses = 0;
   var ties = 0;
@@ -57,19 +58,20 @@ $(document).ready(function() {
 
   // Player listener
   playersRef.on('value', function(playersSnapshot) {
+      //console.log(playersRef);
+    playersNum = playersSnapshot.numChildren();
+      console.log('playersNum: ' + playersNum); 
+      console.log('playerSet: ' + playerSet); 
 
-    var playersNum = playersSnapshot.numChildren();
-      // console.log('playersNum: ' + playersNum); 
-    var playerOneName = playersRef.child('1').name;
-      console.log('playerOneName: ' + playerOneName);
-
-      // console.log('playerSet: ' + playerSet); 
     if (!playerSet) {
-      if (playersSnapshot.numChildren() === 2) {
+        console.log('!playerSet');
+      if (playersNum === 2) {
         $('#busy-game').show();
         $('#start-game').hide();
           console.log('numChildren === 2');
       } else if (playersSnapshot.child('1').exists()) {
+        playerOneName = playersSnapshot.child('1').child('name').val();
+          console.log('playerOneName: ' + playerOneName);
         $('#start-game').show();
         $('#busy-game').hide();
           console.log('child 1 exists');
@@ -80,6 +82,9 @@ $(document).ready(function() {
           console.log('ELSE - no child exists');
         playerId = 1;
       } 
+      playersRef.onDisconnect().remove();
+    } else {
+        console.log('ELSE playerSet')
     }
 
   }, function(errorObject) {
@@ -110,6 +115,7 @@ $(document).ready(function() {
   $('#send-button').on('click', function() {
 
     if (playerSet) {
+        console.log('send button, IF playerSet');
 
       // Do nothing if no message entered
       if ($('#chat-entry').val() !== '') {
